@@ -96,9 +96,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A singleton to present a simple static interface for building requests with
- * {@link RequestBuilder} and maintaining an {@link Engine}, {@link BitmapPool},
- * {@link com.bumptech.glide.load.engine.cache.DiskCache} and {@link MemoryCache}.
+ * A singleton to present a simple static interface for building requests with {@link
+ * RequestBuilder} and maintaining an {@link Engine}, {@link BitmapPool}, {@link
+ * com.bumptech.glide.load.engine.cache.DiskCache} and {@link MemoryCache}.
  */
 public class Glide implements ComponentCallbacks2 {
   private static final String DEFAULT_DISK_CACHE_DIR = "image_manager_disk_cache";
@@ -106,21 +106,21 @@ public class Glide implements ComponentCallbacks2 {
   private static volatile Glide glide;
   private static volatile boolean isInitializing;
 
-  private final Engine engine;
-  private final BitmapPool bitmapPool;
-  private final MemoryCache memoryCache;
+  private final Engine engine;//引擎。负责启动加载、管理活动、缓存资源
+  private final BitmapPool bitmapPool;//bitmap缓存池
+  private final MemoryCache memoryCache;//内存缓存策略
   private final BitmapPreFiller bitmapPreFiller;
   private final GlideContext glideContext;
   private final Registry registry;
   private final ArrayPool arrayPool;
   private final RequestManagerRetriever requestManagerRetriever;
-  private final ConnectivityMonitorFactory connectivityMonitorFactory;
+  private final ConnectivityMonitorFactory connectivityMonitorFactory;//网络状态监听器
   private final List<RequestManager> managers = new ArrayList<>();
   private MemoryCategory memoryCategory = MemoryCategory.NORMAL;
 
   /**
-   * Returns a directory with a default name in the private cache directory of the application to
-   * use to store retrieved media and thumbnails.
+   * 获取一个默认名称的缓存文件夹（在data/data/cache目录下） Returns a directory with a default name in the private
+   * cache directory of the application to use to store retrieved media and thumbnails.
    *
    * @param context A context.
    * @see #getPhotoCacheDir(android.content.Context, String)
@@ -186,8 +186,8 @@ public class Glide implements ComponentCallbacks2 {
   }
 
   /**
-   * @deprecated Use {@link #init(Context, GlideBuilder)} to get a singleton compatible with
-   * Glide's generated API.
+   * @deprecated Use {@link #init(Context, GlideBuilder)} to get a singleton compatible with Glide's
+   * generated API.
    *
    * <p>This method will be removed in a future version of Glide.
    */
@@ -223,17 +223,25 @@ public class Glide implements ComponentCallbacks2 {
     initializeGlide(context, new GlideBuilder());
   }
 
+  /**
+   * 初始化
+   * 主要是加载apt生成类配置、清单文件中的配置
+   */
   @SuppressWarnings("deprecation")
   private static void initializeGlide(@NonNull Context context, @NonNull GlideBuilder builder) {
     Context applicationContext = context.getApplicationContext();
+
+    //获取apt生成类的glide配置
     GeneratedAppGlideModule annotationGeneratedModule = getAnnotationGeneratedGlideModules();
     List<com.bumptech.glide.module.GlideModule> manifestModules = Collections.emptyList();
+    //获取清单文件中glide配置
     if (annotationGeneratedModule == null || annotationGeneratedModule.isManifestParsingEnabled()) {
       manifestModules = new ManifestParser(applicationContext).parse();
     }
 
     if (annotationGeneratedModule != null
         && !annotationGeneratedModule.getExcludedModuleClasses().isEmpty()) {
+      //根据apt类中指定的忽略配置类，排除清单文件中多余配置
       Set<Class<?>> excludedModuleClasses =
           annotationGeneratedModule.getExcludedModuleClasses();
       Iterator<com.bumptech.glide.module.GlideModule> iterator = manifestModules.iterator();
@@ -281,6 +289,7 @@ public class Glide implements ComponentCallbacks2 {
   private static GeneratedAppGlideModule getAnnotationGeneratedGlideModules() {
     GeneratedAppGlideModule result = null;
     try {
+      //GeneratedAppGlideModuleImpl根据apt技术自动生成类，获取glide配置
       Class<GeneratedAppGlideModule> clazz =
           (Class<GeneratedAppGlideModule>)
               Class.forName("com.bumptech.glide.GeneratedAppGlideModuleImpl");
@@ -292,7 +301,7 @@ public class Glide implements ComponentCallbacks2 {
             + " in your application and a @GlideModule annotated AppGlideModule implementation or"
             + " LibraryGlideModules will be silently ignored");
       }
-    // These exceptions can't be squashed across all versions of Android.
+      // These exceptions can't be squashed across all versions of Android.
     } catch (InstantiationException e) {
       throwIncorrectGlideModule(e);
     } catch (IllegalAccessException e) {
@@ -351,14 +360,22 @@ public class Glide implements ComponentCallbacks2 {
             resources.getDisplayMetrics(),
             bitmapPool,
             arrayPool);
+
+    //gif资源解析
     ByteBufferGifDecoder byteBufferGifDecoder =
         new ByteBufferGifDecoder(context, imageHeaderParsers, bitmapPool, arrayPool);
+
     ResourceDecoder<ParcelFileDescriptor, Bitmap> parcelFileDescriptorVideoDecoder =
         VideoDecoder.parcel(bitmapPool);
+    //字节码资源解析器
     ByteBufferBitmapDecoder byteBufferBitmapDecoder = new ByteBufferBitmapDecoder(downsampler);
+    //输入流资源解析器
     StreamBitmapDecoder streamBitmapDecoder = new StreamBitmapDecoder(downsampler, arrayPool);
+
+    //drawable 资源解析器
     ResourceDrawableDecoder resourceDrawableDecoder =
         new ResourceDrawableDecoder(context);
+    //android id  以下几种是格式不同 资源解析器
     ResourceLoader.StreamFactory resourceLoaderStreamFactory =
         new ResourceLoader.StreamFactory(resources);
     ResourceLoader.UriFactory resourceLoaderUriFactory =
@@ -367,15 +384,21 @@ public class Glide implements ComponentCallbacks2 {
         new ResourceLoader.FileDescriptorFactory(resources);
     ResourceLoader.AssetFileDescriptorFactory resourceLoaderAssetFileDescriptorFactory =
         new ResourceLoader.AssetFileDescriptorFactory(resources);
+
+    //图片编码器，将图片转化为文件
     BitmapEncoder bitmapEncoder = new BitmapEncoder(arrayPool);
 
+    //bitmap转化为 byte数组
     BitmapBytesTranscoder bitmapBytesTranscoder = new BitmapBytesTranscoder();
+    //git drawable 转化byte数组
     GifDrawableBytesTranscoder gifDrawableBytesTranscoder = new GifDrawableBytesTranscoder();
 
     ContentResolver contentResolver = context.getContentResolver();
 
     registry
+        //byte数组转化为文件
         .append(ByteBuffer.class, new ByteBufferEncoder())
+        //输入流 转化为文件
         .append(InputStream.class, new StreamEncoder(arrayPool))
         /* Bitmaps */
         .append(Registry.BUCKET_BITMAP, ByteBuffer.class, Bitmap.class, byteBufferBitmapDecoder)
@@ -483,7 +506,7 @@ public class Glide implements ComponentCallbacks2 {
         .append(
             Uri.class,
             ParcelFileDescriptor.class,
-             new UriLoader.FileDescriptorFactory(contentResolver))
+            new UriLoader.FileDescriptorFactory(contentResolver))
         .append(
             Uri.class,
             AssetFileDescriptor.class,
@@ -527,7 +550,7 @@ public class Glide implements ComponentCallbacks2 {
 
   /**
    * Returns the {@link com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool} used to
-   * temporarily store {@link android.graphics.Bitmap}s so they can be reused to avoid garbage
+   * temporarily(临时) store {@link android.graphics.Bitmap}s so they can be reused(重复利用) to avoid garbage(垃圾)
    * collections.
    *
    * <p> Note - Using this pool directly can lead to undefined behavior and strange drawing errors.
@@ -540,9 +563,8 @@ public class Glide implements ComponentCallbacks2 {
    * serve any useful purpose. </p>
    *
    * <p> The primary reason this object is exposed is for use in custom
-   * {@link com.bumptech.glide.load.ResourceDecoder}s and
-   * {@link com.bumptech.glide.load.Transformation}s. Use outside of these classes is not generally
-   * recommended. </p>
+   * {@link com.bumptech.glide.load.ResourceDecoder}s and {@link com.bumptech.glide.load.Transformation}s.
+   * Use outside of these classes is not generally recommended. </p>
    */
   @NonNull
   public BitmapPool getBitmapPool() {
@@ -563,6 +585,7 @@ public class Glide implements ComponentCallbacks2 {
   }
 
   ConnectivityMonitorFactory getConnectivityMonitorFactory() {
+    //Connectivity联通 Monitor监听器
     return connectivityMonitorFactory;
   }
 
@@ -586,15 +609,14 @@ public class Glide implements ComponentCallbacks2 {
    *
    * <p> This method should be used with caution, overly aggressive pre-filling is substantially
    * worse than not pre-filling at all. Pre-filling should only be started in onCreate to avoid
-   * constantly clearing and re-filling the
-   * {@link com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool}. Rotation should be carefully
-   * considered as well. It may be worth calling this method only when no saved instance state
-   * exists so that pre-filling only happens when the Activity is first created, rather than on
-   * every rotation. </p>
+   * constantly clearing and re-filling the {@link com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool}.
+   * Rotation should be carefully considered as well. It may be worth calling this method only when
+   * no saved instance state exists so that pre-filling only happens when the Activity is first
+   * created, rather than on every rotation. </p>
    *
-   * @param bitmapAttributeBuilders The list of
-   * {@link com.bumptech.glide.load.engine.prefill.PreFillType.Builder Builders} representing
-   * individual sizes and configurations of {@link android.graphics.Bitmap}s to be pre-filled.
+   * @param bitmapAttributeBuilders The list of {@link com.bumptech.glide.load.engine.prefill.PreFillType.Builder
+   *                                Builders} representing individual sizes and configurations of
+   *                                {@link android.graphics.Bitmap}s to be pre-filled.
    */
   @SuppressWarnings("unused") // Public API
   public void preFillBitmapPool(@NonNull PreFillType.Builder... bitmapAttributeBuilders) {
@@ -602,6 +624,7 @@ public class Glide implements ComponentCallbacks2 {
   }
 
   /**
+   * 当内存过低时清空缓存
    * Clears as much memory as possible.
    *
    * @see android.content.ComponentCallbacks#onLowMemory()
@@ -634,7 +657,7 @@ public class Glide implements ComponentCallbacks2 {
    * Clears disk cache.
    *
    * <p>
-   *     This method should always be called on a background thread, since it is a blocking call.
+   * This method should always be called on a background thread, since it is a blocking call.
    * </p>
    */
   // Public API.
@@ -656,11 +679,11 @@ public class Glide implements ComponentCallbacks2 {
    * Adjusts Glide's current and maximum memory usage based on the given {@link MemoryCategory}.
    *
    * <p> The default {@link MemoryCategory} is {@link MemoryCategory#NORMAL}.
-   * {@link MemoryCategory#HIGH} increases Glide's maximum memory usage by up to 50% and
-   * {@link MemoryCategory#LOW} decreases Glide's maximum memory usage by 50%. This method should be
-   * used to temporarily increase or decrease memory usage for a single Activity or part of the app.
-   * Use {@link GlideBuilder#setMemoryCache(MemoryCache)} to put a permanent memory size if you want
-   * to change the default. </p>
+   * {@link MemoryCategory#HIGH} increases Glide's maximum memory usage by up to 50% and {@link
+   * MemoryCategory#LOW} decreases Glide's maximum memory usage by 50%. This method should be used
+   * to temporarily increase or decrease memory usage for a single Activity or part of the app. Use
+   * {@link GlideBuilder#setMemoryCache(MemoryCache)} to put a permanent memory size if you want to
+   * change the default. </p>
    *
    * @return the previous MemoryCategory used by Glide.
    */
@@ -677,7 +700,7 @@ public class Glide implements ComponentCallbacks2 {
     return oldCategory;
   }
 
-  @NonNull
+  @NonNull//Retriever取组织器、寻回犬
   private static RequestManagerRetriever getRetriever(@Nullable Context context) {
     // Context could be null for other reasons (ie the user passes in null), but in practice it will
     // only occur due to errors with the Fragment lifecycle.
@@ -729,9 +752,9 @@ public class Glide implements ComponentCallbacks2 {
   }
 
   /**
-   * Begin a load with Glide that will tied to the give
-   * {@link android.support.v4.app.FragmentActivity}'s lifecycle and that uses the given
-   * {@link android.support.v4.app.FragmentActivity}'s default options.
+   * Begin a load with Glide that will tied to the give {@link android.support.v4.app.FragmentActivity}'s
+   * lifecycle and that uses the given {@link android.support.v4.app.FragmentActivity}'s default
+   * options.
    *
    * @param activity The activity to use.
    * @return A RequestManager for the given FragmentActivity that can be used to start a load.
@@ -742,9 +765,8 @@ public class Glide implements ComponentCallbacks2 {
   }
 
   /**
-   * Begin a load with Glide that will be tied to the given
-   * {@link android.support.v4.app.Fragment}'s lifecycle and that uses the given
-   * {@link android.support.v4.app.Fragment}'s default options.
+   * Begin a load with Glide that will be tied to the given {@link android.support.v4.app.Fragment}'s
+   * lifecycle and that uses the given {@link android.support.v4.app.Fragment}'s default options.
    *
    * @param fragment The fragment to use.
    * @return A RequestManager for the given Fragment that can be used to start a load.
@@ -760,9 +782,8 @@ public class Glide implements ComponentCallbacks2 {
    *
    * @param fragment The fragment to use.
    * @return A RequestManager for the given Fragment that can be used to start a load.
-   * @deprecated Prefer support Fragments and {@link #with(Fragment)} instead,
-   * {@link android.app.Fragment} will be deprecated. See
-   * https://github.com/android/android-ktx/pull/161#issuecomment-363270555.
+   * @deprecated Prefer support Fragments and {@link #with(Fragment)} instead, {@link
+   * android.app.Fragment} will be deprecated. See https://github.com/android/android-ktx/pull/161#issuecomment-363270555.
    */
   @SuppressWarnings("deprecation")
   @Deprecated
@@ -772,8 +793,8 @@ public class Glide implements ComponentCallbacks2 {
   }
 
   /**
-   * Begin a load with Glide that will be tied to the lifecycle of the {@link Fragment},
-   * {@link android.app.Fragment}, or {@link Activity} that contains the View.
+   * Begin a load with Glide that will be tied to the lifecycle of the {@link Fragment}, {@link
+   * android.app.Fragment}, or {@link Activity} that contains the View.
    *
    * <p>A {@link Fragment} or {@link android.app.Fragment} is assumed to contain a View if the View
    * is a child of the View returned by the {@link Fragment#getView()}} method.
@@ -790,8 +811,8 @@ public class Glide implements ComponentCallbacks2 {
    * avoiding entirely or using the {@link Fragment}s from the support library instead.
    *
    * <p>If the support {@link FragmentActivity} class is used, this method will only attempt to
-   * discover support {@link Fragment}s. Any non-support {@link android.app.Fragment}s attached
-   * to the {@link FragmentActivity} will be ignored.
+   * discover support {@link Fragment}s. Any non-support {@link android.app.Fragment}s attached to
+   * the {@link FragmentActivity} will be ignored.
    *
    * @param view The view to search for a containing Fragment or Activity from.
    * @return A RequestManager that can be used to start a load.

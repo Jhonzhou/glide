@@ -3,6 +3,12 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 buildscript {
     repositories {
+        maven {
+            url 'https://jitpack.io'
+        }
+        maven {
+            url uri('./repo')
+        }
         google()
         jcenter()
         maven {
@@ -34,6 +40,14 @@ if (JavaVersion.current().isJava8Compatible()) {
 subprojects { project ->
 
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        maven {
+            url 'https://jitpack.io'
+        }
+        maven {
+            url uri('./repo')
+        }
         google()
         jcenter()
         maven {

@@ -27,10 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 负责解析不论是来自cache还是原始的资源，并且应用转换和转码
  * A class responsible for decoding resources either from cached data or from the original source
  * and applying transformations and transcodes.
  *
- * <p>Note: this class has a natural ordering that is inconsistent with equals.
+ * <p>Note: this class has a natural自然 ordering that is inconsistent不一致、前后矛盾的 with equals.
  *
  * @param <R> The type of resource that will be transcoded from the decoded and transformed
  *            resource.

@@ -35,12 +35,13 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
+ *  降低采样频率取样器，  根据图片的exif方向 解码和旋转图片
  * Downsamples, decodes, and rotates images according to their exif orientation.
  */
 public final class Downsampler {
   static final String TAG = "Downsampler";
   /**
-   * Indicates the {@link com.bumptech.glide.load.DecodeFormat} that will be used in conjunction
+   * Indicates(表明、指示) the {@link com.bumptech.glide.load.DecodeFormat} that will be used in conjunction(结合)
    * with the image format to determine the {@link android.graphics.Bitmap.Config} to provide to
    * {@link android.graphics.BitmapFactory.Options#inPreferredConfig} when decoding the image.
    */
@@ -163,6 +164,7 @@ public final class Downsampler {
   }
 
   /**
+   * 根据给定的输入流、options、给定的图片尺寸 来解析图片为bitmap
    * Returns a Bitmap decoded from the given {@link InputStream} that is rotated to match any EXIF
    * data present in the stream and that is downsampled according to the given dimensions and any
    * provided  {@link com.bumptech.glide.load.resource.bitmap.DownsampleStrategy} option.
@@ -192,7 +194,9 @@ public final class Downsampler {
     Preconditions.checkArgument(is.markSupported(), "You must provide an InputStream that supports"
         + " mark()");
 
+    //获取一个指定大小的用户加载图片缓存的数组
     byte[] bytesForOptions = byteArrayPool.get(ArrayPool.STANDARD_BUFFER_SIZE_BYTES, byte[].class);
+    //bitmap配置
     BitmapFactory.Options bitmapFactoryOptions = getDefaultOptions();
     bitmapFactoryOptions.inTempStorage = bytesForOptions;
 
@@ -213,6 +217,20 @@ public final class Downsampler {
     }
   }
 
+  /**
+   * 根据配置 从一个输入流解码出一个bitmap
+   * @param is 输入流
+   * @param options 图片加载配置(图片压缩时使用过，可以加载空bitmap到内存中)
+   * @param downsampleStrategy 采样策略
+   * @param decodeFormat 图片编码格式
+   * @param isHardwareConfigAllowed 是否允许硬件加速
+   * @param requestedWidth 目标宽度
+   * @param requestedHeight 目标高度
+   * @param fixBitmapToRequestedDimensions  是否修复图片到目标尺寸
+   * @param callbacks 回调
+   * @return bitmap
+   * @throws IOException
+   */
   private Bitmap decodeFromWrappedStreams(InputStream is,
       BitmapFactory.Options options, DownsampleStrategy downsampleStrategy,
       DecodeFormat decodeFormat, boolean isHardwareConfigAllowed, int requestedWidth,
@@ -220,6 +238,7 @@ public final class Downsampler {
       DecodeCallbacks callbacks) throws IOException {
     long startTime = LogTime.getLogTime();
 
+    //获取图片原来尺寸
     int[] sourceDimensions = getDimensions(is, options, callbacks, bitmapPool);
     int sourceWidth = sourceDimensions[0];
     int sourceHeight = sourceDimensions[1];
@@ -233,7 +252,9 @@ public final class Downsampler {
       isHardwareConfigAllowed = false;
     }
 
+    //获取图片方向
     int orientation = ImageHeaderParserUtils.getOrientation(parsers, is, byteArrayPool);
+    //获取图片旋转角度
     int degreesToRotate = TransformationUtils.getExifOrientationDegrees(orientation);
     boolean isExifOrientationRequired = TransformationUtils.isExifOrientationRequired(orientation);
 
@@ -293,9 +314,11 @@ public final class Downsampler {
       // If this isn't an image, or BitmapFactory was unable to parse the size, width and height
       // will be -1 here.
       if (expectedWidth > 0 && expectedHeight > 0) {
+        //options.inBitmap 赋值
         setInBitmap(options, bitmapPool, expectedWidth, expectedHeight);
       }
     }
+    //根据输入流和options配置创建bitmap
     Bitmap downsampled = decodeStream(is, options, callbacks, bitmapPool);
     callbacks.onDecodeComplete(bitmapPool, downsampled);
 
@@ -319,6 +342,9 @@ public final class Downsampler {
     return rotated;
   }
 
+  /**
+   * 计算缩放比例
+   */
   private static void calculateScaling(
       ImageType imageType,
       InputStream is,
@@ -343,14 +369,12 @@ public final class Downsampler {
     final float exactScaleFactor;
     if (degreesToRotate == 90 || degreesToRotate == 270) {
       // If we're rotating the image +-90 degrees, we need to downsample accordingly so the image
-      // width is decreased to near our target's height and the image height is decreased to near
+      // width is decreased(减少的) to near our target's height and the image height is decreased to near
       // our target width.
       //noinspection SuspiciousNameCombination
-      exactScaleFactor = downsampleStrategy.getScaleFactor(sourceHeight, sourceWidth,
-          targetWidth, targetHeight);
+      exactScaleFactor = downsampleStrategy.getScaleFactor(sourceHeight, sourceWidth, targetWidth, targetHeight);
     } else {
-      exactScaleFactor =
-          downsampleStrategy.getScaleFactor(sourceWidth, sourceHeight, targetWidth, targetHeight);
+      exactScaleFactor = downsampleStrategy.getScaleFactor(sourceWidth, sourceHeight, targetWidth, targetHeight);
     }
 
     if (exactScaleFactor <= 0f) {
@@ -359,6 +383,7 @@ public final class Downsampler {
           + ", source: [" + sourceWidth + "x" + sourceHeight + "]"
           + ", target: [" + targetWidth + "x" + targetHeight + "]");
     }
+    //采样尺寸取整  按内存优先还是质量优先
     SampleSizeRounding rounding = downsampleStrategy.getSampleSizeRounding(sourceWidth,
         sourceHeight, targetWidth, targetHeight);
     if (rounding == null) {
@@ -388,7 +413,7 @@ public final class Downsampler {
       }
     }
 
-    // Here we mimic framework logic for determining how inSampleSize division is rounded on various
+    // Here we mimic模仿 framework logic逻辑 for determining how inSampleSize division is rounded on various
     // versions of Android. The logic here has been tested on emulators for Android versions 15-26.
     // PNG - Always uses floor
     // JPEG - Always uses ceiling
@@ -464,6 +489,7 @@ public final class Downsampler {
   }
 
   /**
+   *
    * BitmapFactory calculates the density scale factor as a float. This introduces some non-trivial
    * error. This method attempts to account for that error by adjusting the inTargetDensity so that
    * the final scale factor is as close to our target as possible.
@@ -520,7 +546,7 @@ public final class Downsampler {
       return;
     }
 
-    // Changing configs can cause skewing on 4.1, see issue #128.
+    // Changing configs can cause skewing偏移 on 4.1, see issue #128.
     if (format == DecodeFormat.PREFER_ARGB_8888
         || Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN) {
       optionsWithScaling.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -578,6 +604,7 @@ public final class Downsampler {
     int sourceHeight = options.outHeight;
     String outMimeType = options.outMimeType;
     final Bitmap result;
+    //因为在有些设备bitmap绘制不是线程安全的所以加锁
     TransformationUtils.getBitmapDrawableLock().lock();
     try {
       result = BitmapFactory.decodeStream(is, null, options);

@@ -19,6 +19,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 通过添加和移除回调，管理加载的类。当加载完成是通知callback
  * A class that manages a load by adding and removing callbacks for for the load and notifying
  * callbacks when the load completes.
  */

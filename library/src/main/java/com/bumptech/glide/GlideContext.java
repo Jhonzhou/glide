@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Global context for all loads in Glide containing and exposing the various registries and classes
+ * Global context for all loads in Glide containing and exposing the various多种多样的 registries登记。注册 and classes
  * required to load resources.
  */
 public class GlideContext extends ContextWrapper {
@@ -26,12 +26,12 @@ public class GlideContext extends ContextWrapper {
   private final ArrayPool arrayPool;
   private final Registry registry;
   private final ImageViewTargetFactory imageViewTargetFactory;
-  private final RequestOptions defaultRequestOptions;
-  private final List<RequestListener<Object>> defaultRequestListeners;
-  private final Map<Class<?>, TransitionOptions<?, ?>> defaultTransitionOptions;
+  private final RequestOptions defaultRequestOptions;//默认图片加载配置  占位图、错误图片等
+  private final List<RequestListener<Object>> defaultRequestListeners;//全局资源加载监听器
+  private final Map<Class<?>, TransitionOptions<?, ?>> defaultTransitionOptions;//默认图片转场动画
   private final Engine engine;
   private final boolean isLoggingRequestOriginsEnabled;
-  private final int logLevel;
+  private final int logLevel;//日志级别
 
   public GlideContext(
       @NonNull Context context,

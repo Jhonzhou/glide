@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 资源解码注册表
  * Contains an ordered list of {@link ResourceDecoder}s capable of decoding arbitrary data types
  * into arbitrary resource types from highest priority decoders to lowest priority decoders.
  */

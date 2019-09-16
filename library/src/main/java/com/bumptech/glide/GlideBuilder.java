@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ *
  * A builder class for setting default structural classes for Glide to use.
  */
 public final class GlideBuilder {
@@ -71,8 +72,7 @@ public final class GlideBuilder {
   }
 
   /**
-   * Sets the {@link ArrayPool} implementation to allow variable sized arrays to be stored
-   * and retrieved as needed.
+   * Sets the {@link ArrayPool} implementation to allow variable sized arrays to be storedand retrieved as needed.
    *
    * @param arrayPool The pool to use.
    * @return This builder.
@@ -137,7 +137,8 @@ public final class GlideBuilder {
   }
 
   /**
-   * Sets the {@link GlideExecutor} to use when retrieving
+   * 检索缓存使用的线程池
+   * Sets the {@link GlideExecutor} to use when retrieving(检索)
    * {@link com.bumptech.glide.load.engine.Resource}s that are not already in the cache.
    *
    * <p>The thread count defaults to the number of cores available on the device, with a maximum of
@@ -160,6 +161,7 @@ public final class GlideBuilder {
   }
 
   /**
+   * 用于检索磁盘缓存的线程池
    * Sets the {@link GlideExecutor} to use when retrieving
    * {@link com.bumptech.glide.load.engine.Resource}s that are currently in Glide's disk caches.
    *
@@ -183,6 +185,7 @@ public final class GlideBuilder {
   }
 
   /**
+   *加载动画图片的线程池(初步可能没有效果)
    * Sets the {@link GlideExecutor} to use when loading frames of animated images and particularly
    * of {@link com.bumptech.glide.load.resource.gif.GifDrawable}s.
    *
@@ -203,6 +206,7 @@ public final class GlideBuilder {
   }
 
   /**
+   * 设置glide默认加载图片配置
    * Sets the default {@link RequestOptions} to use for all loads across the app.
    *
    * <p>Applying additional options with {@link
@@ -219,6 +223,7 @@ public final class GlideBuilder {
   }
 
   /**
+   * 配置内容和placeHolder过渡之间的动画...等
    * Sets the default {@link TransitionOptions} to use when starting a request that will load a
    * resource with the given {@link Class}.
    *
@@ -244,6 +249,7 @@ public final class GlideBuilder {
   }
 
   /**
+   * 设置内存大小 计算器
    * Sets the {@link MemorySizeCalculator} to use to calculate maximum sizes for default
    * {@link MemoryCache MemoryCaches} and/or default {@link BitmapPool BitmapPools}.
    *
@@ -278,6 +284,7 @@ public final class GlideBuilder {
   }
 
   /**
+   * 设置网络监听器
    * Sets the {@link com.bumptech.glide.manager.ConnectivityMonitorFactory}
    * to use to notify {@link com.bumptech.glide.RequestManager} of connectivity events.
    * If not set {@link com.bumptech.glide.manager.DefaultConnectivityMonitorFactory} would be used.
@@ -331,9 +338,9 @@ public final class GlideBuilder {
   }
 
   /**
+   * 是否允许glide保存使用过的即将被回收和清理的资源
    * If set to {@code true}, allows Glide to re-capture resources that are loaded into
-   * {@link com.bumptech.glide.request.target.Target}s which are subsequently de-referenced and
-   * garbage collected without being cleared.
+   * {@link com.bumptech.glide.request.target.Target}s which are subsequently(随后、后来) de-referenced(应用) and garbage collected without being cleared.
    *
    * <p>Defaults to {@code false}.
    *
@@ -375,7 +382,7 @@ public final class GlideBuilder {
    */
   // Public API.
   @SuppressWarnings("unused")
-  @NonNull
+  @NonNull//Retention保留
   public GlideBuilder setIsActiveResourceRetentionAllowed(
       boolean isActiveResourceRetentionAllowed) {
     this.isActiveResourceRetentionAllowed = isActiveResourceRetentionAllowed;
@@ -383,6 +390,7 @@ public final class GlideBuilder {
   }
 
   /**
+   * 添加全局监听，监听资源加载情况
    * Adds a global {@link RequestListener} that will be added to every request started with Glide.
    *
    * <p>Multiple {@link RequestListener}s can be added here, in {@link RequestManager} scopes or
@@ -409,6 +417,8 @@ public final class GlideBuilder {
   }
 
   /**
+   *Origin起源、开端、出身、原点
+   *
    * Set to {@code true} to make Glide populate
    * {@link com.bumptech.glide.load.engine.GlideException#setOrigin(Exception)} for failed requests.
    *

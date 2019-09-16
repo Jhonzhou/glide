@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * thumb 翻阅  fetcher访问者
  * A {@link DataFetcher} implementation for {@link InputStream}s that loads data from thumbnail
  * files obtained from the {@link MediaStore}.
  */

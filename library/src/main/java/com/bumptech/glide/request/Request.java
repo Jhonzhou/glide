@@ -49,7 +49,7 @@ public interface Request {
   void recycle();
 
   /**
-   * Returns {@code true} if this {@link Request} is equivalent to the given {@link Request} (has
+   * Returns {@code true} if this {@link Request} is equivalent等价的 to the given {@link Request} (has
    * all of the same options and sizes).
    *
    * <p>This method is identical to {@link Object#equals(Object)} except that it's specific to

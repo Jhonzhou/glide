@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * filling填充、填满、遍及
  * A class for pre-filling {@link android.graphics.Bitmap Bitmaps} in a
  * {@link com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool}.
  */

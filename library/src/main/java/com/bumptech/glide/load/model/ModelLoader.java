@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A factory interface for translating an arbitrarily complex data model into a concrete data type
+ * A factory interface for translating翻译、转化、解释 an arbitrarily反复的 complex复杂的 data model into a concrete data type
  * that can be used by an {@link DataFetcher} to obtain the data for a resource represented by the
  * model.
  *

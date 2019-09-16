@@ -885,6 +885,7 @@ public class RequestBuilder<TranscodeType> extends BaseRequestOptions<RequestBui
         callbackExecutor);
   }
 
+  //Recursive 递归
   private Request buildRequestRecursive(
       Target<TranscodeType> target,
       @Nullable RequestListener<TranscodeType> targetListener,
@@ -896,6 +897,7 @@ public class RequestBuilder<TranscodeType> extends BaseRequestOptions<RequestBui
       BaseRequestOptions<?> requestOptions,
       Executor callbackExecutor) {
 
+    //Coordinator 协调器 协调者
     // Build the ErrorRequestCoordinator first if necessary so we can update parentCoordinator.
     ErrorRequestCoordinator errorRequestCoordinator = null;
     if (errorBuilder != null) {
@@ -953,7 +955,7 @@ public class RequestBuilder<TranscodeType> extends BaseRequestOptions<RequestBui
       BaseRequestOptions<?> requestOptions,
       Executor callbackExecutor) {
     if (thumbnailBuilder != null) {
-      // Recursive case: contains a potentially recursive thumbnail request builder.
+      // Recursive case: contains a potentially潜在的 recursive thumbnail request builder.
       if (isThumbnailBuilt) {
         throw new IllegalStateException("You cannot use a request as both the main request and a "
             + "thumbnail, consider using clone() on the request(s) passed to thumbnail()");
@@ -962,8 +964,7 @@ public class RequestBuilder<TranscodeType> extends BaseRequestOptions<RequestBui
       TransitionOptions<?, ? super TranscodeType> thumbTransitionOptions =
           thumbnailBuilder.transitionOptions;
 
-      // Apply our transition by default to thumbnail requests but avoid overriding custom options
-      // that may have been applied on the thumbnail request explicitly.
+      // Apply our transition by default to thumbnail requests but avoid overriding custom options that may have been applied on the thumbnail request explicitly.
       if (thumbnailBuilder.isDefaultTransitionOptionsSet) {
         thumbTransitionOptions = transitionOptions;
       }

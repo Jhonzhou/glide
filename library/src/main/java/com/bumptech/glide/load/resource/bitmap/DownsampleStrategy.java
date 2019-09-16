@@ -4,7 +4,7 @@ import com.bumptech.glide.load.Option;
 import com.bumptech.glide.util.Synthetic;
 
 /**
- * Indicates the algorithm to use when downsampling images.
+ * Indicates the algorithm 算法 to use when downsampling images.
  *
  * <p>{@code DownsampleStrategy} does not provide any guarantees about output sizes. Behavior will
  * differ depending on the {@link com.bumptech.glide.load.ResourceDecoder} using the strategy and

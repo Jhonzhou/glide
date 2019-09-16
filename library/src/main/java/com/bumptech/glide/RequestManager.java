@@ -43,9 +43,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
+ * 为Glide管理和开启request的一个类
  * A class for managing and starting requests for Glide. Can use activity, fragment and connectivity
- * lifecycle events to intelligently stop, start, and restart requests. Retrieve either by
- * instantiating a new object, or to take advantage built in Activity and Fragment lifecycle
+ * lifecycle events to intelligently聪明的 明智的 stop, start, and restart requests. Retrieve either by
+ * instantiating实例化 a new object, or to take advantage built in Activity and Fragment lifecycle
  * handling, use the static Glide.load methods with your Fragment or Activity.
  *
  * @see Glide#with(android.app.Activity)
@@ -79,7 +80,7 @@ public class RequestManager implements LifecycleListener,
     }
   };
   private final Handler mainHandler = new Handler(Looper.getMainLooper());
-  private final ConnectivityMonitor connectivityMonitor;
+  private final ConnectivityMonitor connectivityMonitor;//网络状态 监听器
   // Adding default listeners should be much less common than starting new requests. We want
   // some way of making sure that requests don't mutate our listeners without creating a new copy of
   // the list each time a request is started.
@@ -260,7 +261,7 @@ public class RequestManager implements LifecycleListener,
   }
 
   /**
-   * Performs {@link #pauseRequests()} recursively for all managers that are contextually descendant
+   * Performs {@link #pauseRequests()} recursively递归 for all managers that are contextually descendant
    * to this manager based on the Activity/Fragment hierarchy:
    *
    * <ul>

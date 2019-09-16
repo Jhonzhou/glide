@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 指定的数据类型(byte buffer 、输入流)转化为一个文件
  * Contains an ordered list of {@link Encoder}s capable of encoding arbitrary data types.
  */
 public class EncoderRegistry {

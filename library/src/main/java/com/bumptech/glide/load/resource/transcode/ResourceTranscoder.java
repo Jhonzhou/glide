@@ -6,6 +6,7 @@ import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.engine.Resource;
 
 /**
+ * 资源转换器
  * Transcodes a resource of one type to a resource of another type.
  *
  * @param <Z> The type of the resource that will be transcoded from.

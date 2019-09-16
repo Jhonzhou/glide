@@ -31,8 +31,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Manages component registration to extend or replace Glide's default loading, decoding, and
- * encoding logic.
+ * 管理组件注册表，用以扩展或替换 Glide加载、解码和编码逻辑
+ * Manages component registration to extend or replace Glide's default loading, decoding, and encoding logic.
  */
 // Public API.
 @SuppressWarnings({"WeakerAccess", "unused"})
@@ -43,13 +43,13 @@ public class Registry {
   private static final String BUCKET_PREPEND_ALL = "legacy_prepend_all";
   private static final String BUCKET_APPEND_ALL = "legacy_append";
 
-  private final ModelLoaderRegistry modelLoaderRegistry;
-  private final EncoderRegistry encoderRegistry;
-  private final ResourceDecoderRegistry decoderRegistry;
-  private final ResourceEncoderRegistry resourceEncoderRegistry;
-  private final DataRewinderRegistry dataRewinderRegistry;
-  private final TranscoderRegistry transcoderRegistry;
-  private final ImageHeaderParserRegistry imageHeaderParserRegistry;
+  private final ModelLoaderRegistry modelLoaderRegistry;//数据模型转换器 注册表，将一个复杂的数据模型转化为指定的数据类型
+  private final EncoderRegistry encoderRegistry;//编码注册表 将指定的数据转化为文件
+  private final ResourceDecoderRegistry decoderRegistry;//资源解码注册表  将一个资源解码为bitmap、drawable
+  private final ResourceEncoderRegistry resourceEncoderRegistry;//用resource包裹的编码注册表 将resource包裹的数据转化为文件
+  private final DataRewinderRegistry dataRewinderRegistry;//数据回滚 注册表
+  private final TranscoderRegistry transcoderRegistry;//资源转换器 注册表
+  private final ImageHeaderParserRegistry imageHeaderParserRegistry;//图片头格式解析器注册表
 
   private final ModelToResourceClassCache modelToResourceClassCache =
       new ModelToResourceClassCache();
@@ -368,6 +368,7 @@ public class Registry {
   }
 
   /**
+   * 注册一个图片头解析类
    * Registers a new {@link ImageHeaderParser} that can obtain some basic metadata from an image
    * header (orientation, type etc).
    */

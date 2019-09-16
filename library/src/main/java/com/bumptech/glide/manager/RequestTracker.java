@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
+ *
  * A class for tracking, canceling, and restarting in progress, completed, and failed requests.
  *
  * <p>This class is not thread safe and must be accessed on the main thread.

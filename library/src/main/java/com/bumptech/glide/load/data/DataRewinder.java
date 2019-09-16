@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import java.io.IOException;
 
 /**
+ * Rewinder 重绕、倒带、倒回
  * Responsible for rewinding a stream like data types.
  *
  * @param <T> The stream like data type that can be rewound.

@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import java.io.File;
 
 /**
- * An interface for writing data to some persistent data store (i.e. a local File cache).
+ * An interface for writing data to some persistent持久的 data store (i.e. a local File cache).
  *
  * @param <T> The type of the data that will be written.
  */

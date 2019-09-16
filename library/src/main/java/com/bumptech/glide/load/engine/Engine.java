@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 
 /**
+ * 负责启动加载、管理活动、缓存资源
  * Responsible for starting loads and managing active and cached resources.
  */
 public class Engine implements EngineJobListener,
@@ -38,7 +39,7 @@ public class Engine implements EngineJobListener,
   private final MemoryCache cache;
   private final EngineJobFactory engineJobFactory;
   private final ResourceRecycler resourceRecycler;
-  private final LazyDiskCacheProvider diskCacheProvider;
+  private final LazyDiskCacheProvider diskCacheProvider;//磁盘缓存提供者
   private final DecodeJobFactory decodeJobFactory;
   private final ActiveResources activeResources;
 
@@ -171,6 +172,7 @@ public class Engine implements EngineJobListener,
     EngineKey key = keyFactory.buildKey(model, signature, width, height, transformations,
         resourceClass, transcodeClass, options);
 
+    //从activeResources中获取资源
     EngineResource<?> active = loadFromActiveResources(key, isMemoryCacheable);
     if (active != null) {
       cb.onResourceReady(active, DataSource.MEMORY_CACHE);
@@ -180,6 +182,7 @@ public class Engine implements EngineJobListener,
       return null;
     }
 
+    //从memoryCache中获取缓数据（移除），添加到activeResources中
     EngineResource<?> cached = loadFromCache(key, isMemoryCacheable);
     if (cached != null) {
       cb.onResourceReady(cached, DataSource.MEMORY_CACHE);
